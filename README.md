@@ -1,28 +1,24 @@
-# $PROJECT_NAME README
+# tbLEND-js
 
-Congrats, project leads! You got a new project to grow!
-
-This stub is meant to help you form a strong community around your work. It's yours to adapt, and may 
-diverge from this initial structure. Just keep the files seeded in this repo, and the rest is yours to evolve! 
+This package aims to provide tools to make it easy to interact with the tbLEND protocol
 
 ## Introduction
 
-Orient users to the project here. This is a good place to start with an assumption
-that the user knows very little - so start with the Big Picture and show how this
-project fits into it. It may be good to reference/link the broader architecture in the
-`collaboration` repo or the developer site here.
+tbLEND is a Web5 lending protocol. There are many participants in the protocol, including users seeking a loan, banking data providers, credit score providers, and lenders.
 
-Then maybe a dive into what this project does.
+The data providers and lenders in this protocol will need to have an integration layer between their existing services and web5.
 
-Diagrams and other visuals are helpful here. Perhaps code snippets showing usage.
+## Installation
 
-Project leads should complete, alongside this `README`:
-* [CODEOWNERS](./CODEOWNERS) - set project lead(s)
-* [CONTRIBUTING.md](./CONTRIBUTING.md) - Fill out how to: install prereqs, build, test, run, access CI, chat, discuss, file issues
-* [Bug-report.md](.github/ISSUE_TEMPLATE/bug-report.md) - Fill out `Assignees` add codeowners @names
-* [config.yml](.github/ISSUE_TEMPLATE/config.yml) - remove "(/add your discord channel..)" and replace the url with your Discord channel if applicable
+```sh
+npm i https://github.com/TBD54566975/incubation-tblend
+```
 
-The other files in this template repo may be used as-is:
+## Testing
+```sh
+npm test
+```
+
 * [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 * [GOVERNANCE.md](./GOVERNANCE.md)
 * [LICENSE](./LICENSE)

@@ -1,0 +1,30 @@
+{
+  "name": "tblend-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "npm run build",
+    "test": "NODE_NO_WARNINGS=1 mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.3.7",
+    "@types/mocha": "^10.0.2",
+    "@types/uuid": "^9.0.5",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@web5/credentials": "^0.3.0",
+    "@web5/crypto": "^0.2.0",
+    "@web5/dids": "^0.2.0",
+    "uuid": "^9.0.1"
+  }
+}
