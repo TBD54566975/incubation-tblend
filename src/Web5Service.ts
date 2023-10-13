@@ -10,7 +10,7 @@ const VC_MIME_TYPE = "application/vc+jwt";
 
 type Signer = (data: Uint8Array) => Promise<Uint8Array>;
 
-export default class Web5Service {
+export class Web5Service {
     public identity: null | PortableDid;
     public signingKeyPair: any;
     private signingPrivateKey: any;
