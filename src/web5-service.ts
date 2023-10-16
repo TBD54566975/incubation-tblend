@@ -39,7 +39,7 @@ export class Web5Service {
 
     public handlers: Array<IMatchHandler>;
 
-    private constructor() {
+    constructor() {
         this.identity = null;
         this.dwn = null;
         this.service = null;
@@ -48,7 +48,7 @@ export class Web5Service {
         this.server = null;
     }
 
-    public static async create(options?: { configFile?: string, levelDbDir?: boolean, anchor?: boolean, services?: DidService[], dwnServiceEndpoints: string[], port: number }) {
+    public async start(options?: { configFile?: string, levelDbDir?: string, anchor?: boolean, services?: DidService[], dwnServiceEndpoints: string[], port: number }) {
         const {
             configFile = "./config.json",
             levelDbDir = "./DATA",

@@ -5,11 +5,11 @@ import { PresentationDefinition } from '@web5/credentials';
 
 describe('Web5Service', () => {
 
-  let web5service: Web5Service;
+  let web5service = new Web5Service();
 
   before(async () => {
     try {
-      web5service = await Web5Service.create();
+      web5service = await web5service.start();
     } catch (e) {
       console.error(e);
     }
