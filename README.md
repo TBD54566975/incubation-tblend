@@ -1,6 +1,7 @@
-# tbLEND-js
+# tbLEND-service
 
-This package aims to provide tools to make it easy to interact with the tbLEND protocol
+This package aims to provide a service to make it easy to participate in the tbLEND protocol. This project is heavily based on [DWN-Proxy](https://github.com/TBD54566975/dwn-proxy-js), with convenience methods for Verifiable Credentials and Verifiable Presentations.
+
 
 ## Introduction
 
@@ -8,10 +9,27 @@ tbLEND is a Web5 lending protocol. There are many participants in the protocol, 
 
 The data providers and lenders in this protocol will need to have an integration layer between their existing services and web5.
 
+## Config
+This service writes a file ./config.json upon first run. This file contains private keys, and should be mounted in a secure way for production.
+
+This service also uses ./DATA for the LevelDB storage for the DWN.
+
+Both of these locations can be customized when initializing the Web5Service.
+
 ## Installation
 
 ```sh
 npm i https://github.com/TBD54566975/incubation-tblend
+```
+
+## Usage
+
+```ts
+    import {Web5Service} from '@TBD54566975/incubation-tblend'
+
+    class MyWeb5Service extends Web5Service {
+        ...
+    }
 ```
 
 ## Testing

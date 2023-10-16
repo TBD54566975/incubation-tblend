@@ -35,13 +35,9 @@ yarn-error.log*
 next-env.d.ts
 
 DATA/
-DATASTORE/
-EVENTLOG/
-INDEX/
-MESSAGESTORE/
 
 dist/
 
-keySet.json
+config.json
 
 tsconfig.tsbuildinfo

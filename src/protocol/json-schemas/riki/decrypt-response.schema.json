@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://tblend.io/protocol/riki/decrypt-request.schema.json",
+    "type": "object",
+    "properties": {
+        "decryptedVC": {
+            "type": "string",
+            "description": "The full RIKI report JWT, decrypted"
+        }
+    },
+    "required": [
+        "decryptedVC"
+    ]
+}

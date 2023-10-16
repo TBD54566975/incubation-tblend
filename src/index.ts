@@ -1,1 +1,1 @@
-export * from './Web5Service.js'
+export * from './web5-service.js'

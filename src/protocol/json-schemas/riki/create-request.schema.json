@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://tblend.io/protocol/riki/create-request.schema.json",
+    "type": "object",
+    "properties": {
+        "verifiablePresentation": {
+            "type": "string",
+            "description": "A Verifiable Presentation JWT containing banking VCs for generating a RIKI report"
+        }
+    },
+    "required": [
+        "verifiablePresentation"
+    ]
+}
