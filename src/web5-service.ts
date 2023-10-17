@@ -1,33 +1,23 @@
 import { CreateVpOptions, CredentialSubject, VerifiableCredential, VerifiableCredentialTypeV1, VerifiablePresentation, utils } from '@web5/credentials';
 import { Ed25519, Jose } from '@web5/crypto';
-import { DidIonMethod, PortableDid, DidService, utils as didUtils } from '@web5/dids';
-import { DataStoreLevel, Dwn, EventLogLevel, MessageStoreLevel } from '@tbd54566975/dwn-sdk-js'
+import { DidIonMethod, PortableDid, DidService, utils as didUtils, DidKeySetVerificationMethodKey } from '@web5/dids';
+import { DataStoreLevel, Dwn, DwnInterfaceName, DwnMethodName, EventLogLevel, EventsGet, Message, MessageStoreLevel, MessagesGet, ProtocolsConfigure, ProtocolsConfigureDescriptor, ProtocolsConfigureMessage, ProtocolsConfigureOptions, ProtocolsQuery, ProtocolsQueryOptions, RecordsDelete, RecordsQuery, RecordsRead, RecordsWrite, RecordsWriteOptions, UnionMessageReply } from '@tbd54566975/dwn-sdk-js'
 import { v4 as uuidv4 } from 'uuid';
 import { writeFile, readFile } from 'fs/promises';
+
+import { ReadableWebToNodeStream } from 'readable-web-to-node-stream';
 
 import { PrivateTenantGate } from './private-tenant-gate.js';
 import { DwnHttpServer } from './dwn-http-server.js';
 import { DwnHttpClient } from './dwn-http-client.js';
-import type { DwnRequest, DwnResponse } from './dwn-types.js';
+
+import { Protocol, type DwnRequest, type DwnResponse, type IHandler, type IMatch, type IMatchHandler, type ProtocolsConfigureRequest, type ProtocolsConfigureResponse, ProtocolsQueryRequest, ProcessDwnRequest, ProcessDwnResponse, Signer, Signer2 } from './dwn-types.js';
+import type { Readable } from 'readable-stream';
 
 import { Server } from "http"
-
-interface IMatch {
-    (req: DwnRequest): boolean
-}
-interface IHandler {
-    (dwnRequest: DwnRequest): Promise<void | DwnResponse>
-}
-interface IMatchHandler {
-    match: IMatch
-    handler: IHandler
-}
-
-type Signer = (data: Uint8Array) => Promise<Uint8Array>;
-
 export class Web5Service {
     public identity: null | PortableDid;
-    public signingKeyPair: any;
+    public signingKeyPair: DidKeySetVerificationMethodKey | undefined;
 
     private signingPrivateKey: any;
     public dwn: null | Dwn;
@@ -145,6 +135,36 @@ export class Web5Service {
         this.handlers.push({ match, handler })
     }
 
+    async configureProtocol(request: ProtocolsConfigureRequest): Promise<ProtocolsConfigureResponse> {
+        const dwnResponse = await this.processDwnRequest({
+            target: `${this.identity?.did}`,
+            author: `${this.identity?.did}`,
+            messageOptions: request.message,
+            messageType: DwnInterfaceName.Protocols + DwnMethodName.Configure
+        });
+
+        const { message, messageCid, reply: { status } } = dwnResponse;
+        const response: ProtocolsConfigureResponse = { status };
+
+        if (status.code < 300) {
+            const metadata = { author: `${this.identity?.did}`, messageCid };
+            response.protocol = new Protocol(message as ProtocolsConfigureMessage, metadata);
+        }
+
+        return response;
+    }
+
+    async queryProtocol(request: ProtocolsQueryRequest) {
+        const agentRequest = {
+            author: `${this.identity?.did}`,
+            messageOptions: request.message,
+            messageType: DwnInterfaceName.Protocols + DwnMethodName.Query,
+            target: request.from || `${this.identity?.did}`
+        };
+
+        return this.processDwnRequest(agentRequest);
+    }
+
     stop() {
         return new Promise<void>((resolve) => {
             if (this.server) {
@@ -239,4 +259,100 @@ export class Web5Service {
             return false;
         }
     }
+
+    async processDwnRequest(request: ProcessDwnRequest): Promise<ProcessDwnResponse> {
+        const { message, dataStream } = await this.constructDwnMessage({ request });
+
+        let reply: UnionMessageReply;
+        if (request.store !== false && this.dwn) {
+            reply = await this.dwn.processMessage(`${request.target}`, message, dataStream);
+        } else {
+            reply = { status: { code: 202, detail: 'Accepted' } };
+        }
+
+        return {
+            reply,
+            message: message,
+            messageCid: await Message.getCid(message)
+        };
+    }
+
+    private async constructDwnMessage(options: {
+        request: ProcessDwnRequest
+    }) {
+        const { request } = options;
+
+        let readableStream: Readable | undefined;
+
+        // TODO: Consider refactoring to move data transformations imposed by fetch() limitations to the HTTP transport-related methods.
+        if (request.messageType === 'RecordsWrite') {
+            const messageOptions = request.messageOptions as RecordsWriteOptions;
+
+            if (request.dataStream && !messageOptions.data) {
+                const { dataStream } = request;
+                let isomorphicNodeReadable: Readable;
+
+                if (dataStream instanceof Blob) {
+                    isomorphicNodeReadable = blobToIsomorphicNodeReadable(dataStream);
+                    readableStream = blobToIsomorphicNodeReadable(dataStream);
+
+                } else if (dataStream instanceof ReadableStream) {
+                    const [forCid, forProcessMessage] = dataStream.tee();
+                    isomorphicNodeReadable = webReadableToIsomorphicNodeReadable(forCid);
+                    readableStream = webReadableToIsomorphicNodeReadable(forProcessMessage);
+                }
+
+                // @ts-ignore
+                messageOptions.dataCid = await Cid.computeDagPbCidFromStream(isomorphicNodeReadable);
+                // @ts-ignore
+                messageOptions.dataSize ??= isomorphicNodeReadable['bytesRead'];
+            }
+        }
+
+        const dwnAuthorizationSigner = await this.constructDwnAuthorizationSigner(request.author);
+
+        const messageCreator = dwnMessageCreators[request.messageType];
+        const dwnMessage = await messageCreator.create({
+            ...<any>request.messageOptions,
+            authorizationSigner: dwnAuthorizationSigner
+        });
+
+        return { message: dwnMessage.toJSON(), dataStream: readableStream };
+    }
+
+    private async constructDwnAuthorizationSigner(author: string): Promise<Signer2> {
+        if (!this.identity) {
+            throw new Error('Not initialized')
+        }
+
+        const alg = this.signingKeyPair?.privateKeyJwk?.alg
+        if (alg === undefined) {
+            throw Error(`No algorithm provided to sign with key`);
+        }
+
+        return {
+            keyId: this.getKeyId(this.identity?.did),
+            algorithm: alg,
+            sign: this.getSigner()
+        };
+    }
+}
+
+const dwnMessageCreators = {
+    [DwnInterfaceName.Events + DwnMethodName.Get]: EventsGet,
+    [DwnInterfaceName.Messages + DwnMethodName.Get]: MessagesGet,
+    [DwnInterfaceName.Records + DwnMethodName.Read]: RecordsRead,
+    [DwnInterfaceName.Records + DwnMethodName.Query]: RecordsQuery,
+    [DwnInterfaceName.Records + DwnMethodName.Write]: RecordsWrite,
+    [DwnInterfaceName.Records + DwnMethodName.Delete]: RecordsDelete,
+    [DwnInterfaceName.Protocols + DwnMethodName.Query]: ProtocolsQuery,
+    [DwnInterfaceName.Protocols + DwnMethodName.Configure]: ProtocolsConfigure,
+};
+
+export function webReadableToIsomorphicNodeReadable(webReadable: ReadableStream<any>) {
+    return new ReadableWebToNodeStream(webReadable);
+}
+
+export function blobToIsomorphicNodeReadable(blob: Blob): Readable {
+    return webReadableToIsomorphicNodeReadable(blob.stream() as ReadableStream<any>);
 }
