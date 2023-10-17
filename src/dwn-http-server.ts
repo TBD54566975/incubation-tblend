@@ -32,6 +32,8 @@ export class DwnHttpServer {
         this.api.use(cors({ exposedHeaders: 'dwn-response' }))
         this.api.get('/health', (_, res) => res.json({ ok: true }))
 
+        this.api.use('/protocol', express.static('json-schemas'))
+
         this.api.get('/', (_req, res) => {
             // return a plain text string
             res.setHeader('content-type', 'text/plain')

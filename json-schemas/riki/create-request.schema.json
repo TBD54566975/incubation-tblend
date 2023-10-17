@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://tblend.io/protocol/riki/create-request.schema.json",
+    "type": "object",
+    "properties": {
+        "accountVCs": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "The Verifiable Credentials that represent your bank accounts"
+        },
+        "identityVCs": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "The Verifiable Credentials that represent your banking identity"
+        },
+        "transactionVCs": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "The Verifiable Credentials that represent your bank transactions"
+        }
+    },
+    "required": [
+        "verifiablePresentation"
+    ]
+}
