@@ -48,14 +48,16 @@ export class Web5Service {
         this.server = null;
     }
 
-    public async start(options?: { configFile?: string, levelDbDir?: string, anchor?: boolean, services?: DidService[], dwnServiceEndpoints: string[], port: number }) {
+    public async start(options?: { configFile?: string, levelDbDir?: string, services?: DidService[], dwnServiceEndpoints: string[], port: number, operationsEndpoint?: string, challengeEndpoint?: string, challengeEnabled?: boolean }) {
         const {
             configFile = "./config.json",
             levelDbDir = "./DATA",
-            anchor,
             services = [],
             dwnServiceEndpoints = ['http://localhost:8080'],
-            port = 8080
+            port = 8080,
+            challengeEnabled = false,
+            challengeEndpoint = 'https://ion.tbddev.org/proof-of-work',
+            operationsEndpoint = 'https://ion.tbddev.org/operations'
         } = options || {};
 
         let configString;
@@ -69,20 +71,36 @@ export class Web5Service {
         if (configString) {
             const config = JSON.parse(configString);
             // recreate DID using existing config
-            this.identity = await DidIonMethod.create({ anchor, services: config.services, keySet: config.keySet })
+            this.identity = await DidIonMethod.create({ services: config.services, keySet: config.keySet })
         } else {
             // create new DID w/ DWN keys
             const dwnOptions = await DidIonMethod.generateDwnOptions({ serviceEndpointNodes: dwnServiceEndpoints });
             dwnOptions.services = dwnOptions.services || [];
 
             this.identity = await DidIonMethod.create({
-                anchor,
                 services: [
                     ...services,
                     ...dwnOptions.services
                 ],
                 keySet: dwnOptions.keySet
             });
+
+            const resolved = await DidIonMethod.resolve({
+                didUrl: `${this.identity.canonicalId}`
+            });
+
+            if (!resolved.didDocument) {
+                await DidIonMethod.anchor({
+                    services: [
+                        ...services,
+                        ...dwnOptions.services
+                    ],
+                    keySet: this.identity.keySet,
+                    challengeEnabled,
+                    challengeEndpoint,
+                    operationsEndpoint,
+                })
+            }
 
             await writeFile(configFile, JSON.stringify({
                 keySet: this.identity.keySet,
