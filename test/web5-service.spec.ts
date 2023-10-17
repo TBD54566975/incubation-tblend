@@ -9,7 +9,7 @@ describe('Web5Service', () => {
 
   before(async () => {
     try {
-      web5service = await web5service.start();
+      await web5service.start();
     } catch (e) {
       console.error(e);
     }
@@ -17,6 +17,10 @@ describe('Web5Service', () => {
 
   after(async () => {
     await web5service.stop();
+  })
+
+  it('should have an identity', () => {
+    assert(web5service.identity !== null);
   })
 
   it('should create, verify, and decode credentials', async () => {

@@ -58,8 +58,6 @@ export class Web5Service {
             port = 8080
         } = options || {};
 
-        const web5service = new Web5Service();
-
         let configString;
         try {
             const configBuffer = await readFile(configFile);
@@ -71,13 +69,13 @@ export class Web5Service {
         if (configString) {
             const config = JSON.parse(configString);
             // recreate DID using existing config
-            web5service.identity = await DidIonMethod.create({ anchor, services: config.services, keySet: config.keySet })
+            this.identity = await DidIonMethod.create({ anchor, services: config.services, keySet: config.keySet })
         } else {
             // create new DID w/ DWN keys
             const dwnOptions = await DidIonMethod.generateDwnOptions({ serviceEndpointNodes: dwnServiceEndpoints });
             dwnOptions.services = dwnOptions.services || [];
 
-            web5service.identity = await DidIonMethod.create({
+            this.identity = await DidIonMethod.create({
                 anchor,
                 services: [
                     ...services,
@@ -87,7 +85,7 @@ export class Web5Service {
             });
 
             await writeFile(configFile, JSON.stringify({
-                keySet: web5service.identity.keySet,
+                keySet: this.identity.keySet,
                 services: [
                     ...services,
                     ...dwnOptions.services
@@ -95,22 +93,22 @@ export class Web5Service {
             }, null, 2));
         }
 
-        [web5service.signingKeyPair] = web5service.identity.keySet.verificationMethodKeys!;
-        web5service.signingPrivateKey = (await Jose.jwkToKey({ key: web5service.signingKeyPair.privateKeyJwk! })).keyMaterial;
+        [this.signingKeyPair] = this.identity.keySet.verificationMethodKeys!;
+        this.signingPrivateKey = (await Jose.jwkToKey({ key: this.signingKeyPair.privateKeyJwk! })).keyMaterial;
 
         const messageStore = new MessageStoreLevel({ blockstoreLocation: levelDbDir + '/MESSAGESSTORE', indexLocation: levelDbDir + '/INDEX' });
         const dataStore = new DataStoreLevel({ blockstoreLocation: levelDbDir + '/DATASTORE' });
         const eventLog = new EventLogLevel({ location: levelDbDir + '/EVENTLOG' });
 
-        const dwn = await Dwn.create({ messageStore, dataStore, eventLog, tenantGate: PrivateTenantGate.create(web5service.identity.did) });
-        web5service.dwn = dwn;
+        const dwn = await Dwn.create({ messageStore, dataStore, eventLog, tenantGate: PrivateTenantGate.create(this.identity.did) });
+        this.dwn = dwn;
 
         try {
-            web5service.service = new DwnHttpServer({
+            this.service = new DwnHttpServer({
                 dwn,
                 handler: async (request: DwnRequest): Promise<DwnResponse | void> => {
                     // [kw] could use a has map of sorts instead of iterating every time
-                    for (const { match, handler } of web5service.handlers) {
+                    for (const { match, handler } of this.handlers) {
                         if (match(request))
                             return await handler(request)
                     }
@@ -119,12 +117,10 @@ export class Web5Service {
                 }
             });
 
-            web5service.server = web5service.service.listen(port);
+            this.server = this.service.listen(port);
         } catch (e) {
             console.error(e);
         }
-
-        return web5service;
     }
 
     addHandler(match: IMatch, handler: IHandler) {
