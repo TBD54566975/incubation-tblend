@@ -14,6 +14,9 @@ export class PrivateTenantGate implements TenantGate {
 
     public async isTenant(did: string): Promise<boolean> {
         // Custom implementation
+        if (did !== this.tenantDid) {
+            console.log('Recieved a message for non-tenant did ' + did);
+        }
         return did === this.tenantDid;
     }
 }
