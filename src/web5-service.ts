@@ -11,7 +11,7 @@ import { PrivateTenantGate } from './private-tenant-gate.js';
 import { DwnHttpServer } from './dwn-http-server.js';
 import { DwnHttpClient } from './dwn-http-client.js';
 
-import { Protocol, type DwnRequest, type DwnResponse, type IHandler, type IMatch, type IMatchHandler, type ProtocolsConfigureRequest, type ProtocolsConfigureResponse, ProtocolsQueryRequest, ProcessDwnRequest, ProcessDwnResponse, Signer, Signer2 } from './dwn-types.js';
+import { Protocol, type DwnRequest, type DwnResponse, type IHandler, type IMatch, type IMatchHandler, type ProtocolsConfigureRequest, type ProtocolsConfigureResponse, ProtocolsQueryRequest, ProcessDwnRequest, ProcessDwnResponse, Signer, Signer2, GenericMessageReply } from './dwn-types.js';
 import type { Readable } from 'readable-stream';
 
 import { Server } from "http"
@@ -189,6 +189,11 @@ export class Web5Service {
             const signature = await Ed25519.sign({ data, key: privateKey });
             return signature;
         }
+    }
+
+    messageReplyFromError(e: unknown, code: number): GenericMessageReply {
+        const detail = e instanceof Error ? e.message : 'Error';
+        return { status: { code, detail } };
     }
 
     async createVC({ credentialSubject, subjectDid, type }: { credentialSubject: CredentialSubject, subjectDid: string, type: string }) {

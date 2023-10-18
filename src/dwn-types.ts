@@ -1,6 +1,16 @@
 import type { Readable } from 'node:stream'
 import type { UnionMessageReply, RecordsQueryMessage, RecordsWriteMessage, ProtocolsConfigureOptions, ProtocolsQueryOptions, ProtocolsConfigureDescriptor, ProtocolsConfigureMessage } from '@tbd54566975/dwn-sdk-js'
 
+
+type Status = {
+  code: number
+  detail: string
+};
+
+export type GenericMessageReply = {
+  status: Status;
+};
+
 export type DwnMessage = RecordsQueryMessage | RecordsWriteMessage
 
 export type DwnRequest = {
