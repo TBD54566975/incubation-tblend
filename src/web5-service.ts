@@ -1,6 +1,6 @@
 import { CreateVpOptions, CredentialSubject, VerifiableCredential, VerifiableCredentialTypeV1, VerifiablePresentation, utils } from '@web5/credentials';
 import { Ed25519, Jose } from '@web5/crypto';
-import { DidIonMethod, PortableDid, DidService, utils as didUtils, DidKeySetVerificationMethodKey } from '@web5/dids';
+import { DidIonMethod, PortableDid, DidService, DidKeySetVerificationMethodKey } from '@web5/dids';
 import { DataStoreLevel, Dwn, DwnInterfaceName, DwnMethodName, EventLogLevel, EventsGet, Message, MessageStoreLevel, MessagesGet, ProtocolsConfigure, ProtocolsConfigureDescriptor, ProtocolsConfigureMessage, ProtocolsConfigureOptions, ProtocolsQuery, ProtocolsQueryOptions, RecordsDelete, RecordsQuery, RecordsRead, RecordsWrite, RecordsWriteOptions, UnionMessageReply } from '@tbd54566975/dwn-sdk-js'
 import { v4 as uuidv4 } from 'uuid';
 import { writeFile, readFile } from 'fs/promises';
