@@ -19,13 +19,13 @@ export class Web5Service {
     public identity: null | PortableDid;
     public signingKeyPair: DidKeySetVerificationMethodKey | undefined;
 
-    private signingPrivateKey: any;
+    public signingPrivateKey: any;
     public dwn: null | Dwn;
 
-    private service: null | DwnHttpServer;
-    private client: DwnHttpClient;
+    public service: null | DwnHttpServer;
+    public client: DwnHttpClient;
 
-    private server: null | Server;
+    public server: null | Server;
 
     public handlers: Array<IMatchHandler>;
 
