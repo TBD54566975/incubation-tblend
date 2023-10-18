@@ -42,12 +42,22 @@ export class MyWeb5Service extends Web5Service {
 
     constructor() {
         super();
-        this.addHandler(isCreateRequest, this.requestRIKI);
+        this.addHandler(isCreateRequest, this.requestRIKI.bind(this));
     }
 
     // handle incoming DWN create message
     async handleCreateRequest(request: DwnRequest) {
+        // do whatever you want here
 
+        return {
+                reply: {
+                    status: {
+                        code: 202,
+                        detail: 'Accepted'
+                    }
+
+                }
+            };
     }
 }
 ```
