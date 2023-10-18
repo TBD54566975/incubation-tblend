@@ -227,12 +227,8 @@ export class Web5Service {
     }
 
     async verifyVC(verifiableCredentialJWT: string) {
-        try {
-            await VerifiableCredential.verify(verifiableCredentialJWT);
-            return true;
-        } catch (e) {
-            return false;
-        }
+        await VerifiableCredential.verify(verifiableCredentialJWT);
+        return true;
     }
 
     async createVP(createVpOptions: CreateVpOptions, subjectDid: string) {
@@ -257,12 +253,8 @@ export class Web5Service {
     }
 
     async verifyVP(verifiablePresentationJWT: string) {
-        try {
-            await VerifiablePresentation.verify(verifiablePresentationJWT);
-            return true;
-        } catch (e) {
-            return false;
-        }
+        await VerifiablePresentation.verify(verifiablePresentationJWT);
+        return true;
     }
 
     async processDwnRequest(request: ProcessDwnRequest): Promise<ProcessDwnResponse> {
