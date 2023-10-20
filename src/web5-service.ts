@@ -1,7 +1,7 @@
 import { CreateVpOptions, CredentialSubject, VerifiableCredential, VerifiableCredentialTypeV1, VerifiablePresentation, utils } from '@web5/credentials';
 import { Ed25519, Jose } from '@web5/crypto';
 import { DidIonMethod, PortableDid, DidService, DidKeySetVerificationMethodKey } from '@web5/dids';
-import { DataStoreLevel, Dwn, DwnInterfaceName, DwnMethodName, EventLogLevel, EventsGet, Message, MessageStoreLevel, MessagesGet, ProtocolsConfigure, ProtocolsConfigureDescriptor, ProtocolsConfigureMessage, ProtocolsConfigureOptions, ProtocolsQuery, ProtocolsQueryOptions, RecordsDelete, RecordsQuery, RecordsRead, RecordsWrite, RecordsWriteOptions, UnionMessageReply } from '@tbd54566975/dwn-sdk-js'
+import { DataStoreLevel, Dwn, DwnInterfaceName, DwnMethodName, EventLogLevel, EventsGet, Jws, Message, MessageStoreLevel, MessagesGet, ProtocolsConfigure, ProtocolsConfigureMessage, ProtocolsQuery, RecordsDelete, RecordsQuery, RecordsRead, RecordsWrite, RecordsWriteOptions, UnionMessageReply } from '@tbd54566975/dwn-sdk-js'
 import { v4 as uuidv4 } from 'uuid';
 import { writeFile, readFile } from 'fs/promises';
 
@@ -11,7 +11,7 @@ import { PrivateTenantGate } from './private-tenant-gate.js';
 import { DwnHttpServer } from './dwn-http-server.js';
 import { DwnHttpClient } from './dwn-http-client.js';
 
-import { Protocol, type DwnRequest, type DwnResponse, type IHandler, type IMatch, type IMatchHandler, type ProtocolsConfigureRequest, type ProtocolsConfigureResponse, ProtocolsQueryRequest, ProcessDwnRequest, ProcessDwnResponse, Signer, Signer2, GenericMessageReply } from './dwn-types.js';
+import { Protocol, type DwnRequest, type DwnResponse, type IHandler, type IMatch, type IMatchHandler, type ProtocolsConfigureRequest, type ProtocolsConfigureResponse, ProtocolsQueryRequest, ProcessDwnRequest, ProcessDwnResponse, Signer, Signer2, GenericMessageReply, SignatureEntry } from './dwn-types.js';
 import type { Readable } from 'readable-stream';
 
 import { Server } from "http"
@@ -129,6 +129,10 @@ export class Web5Service {
         } catch (e) {
             console.error(e);
         }
+    }
+
+    getJwsSignerDid(signatureEntry: SignatureEntry) {
+        return Jws.getSignerDid(signatureEntry);
     }
 
     addHandler(match: IMatch, handler: IHandler) {

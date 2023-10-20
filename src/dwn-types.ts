@@ -128,3 +128,22 @@ export class Protocol {
     return this._protocolsConfigureMessage;
   }
 }
+
+/**
+ * An entry of the `signatures` array in a general JWS.
+ */
+export type SignatureEntry = {
+  /**
+   * The "protected" member MUST be present and contain the value
+   * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected
+   * Header value is non-empty; otherwise, it MUST be absent.  These
+   * Header Parameter values are integrity protected.
+   */
+  protected: string
+
+  /**
+   * The "signature" member MUST be present and contain the value
+   * BASE64URL(JWS Signature).
+   */
+  signature: string
+};
