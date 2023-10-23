@@ -332,7 +332,7 @@ export class Web5Service {
         }
 
         return {
-            keyId: this.getKeyId(this.identity?.did),
+            keyId: this.getKeyId(this.identity?.did) + '#dwn-sig',
             algorithm: alg,
             sign: this.getSigner()
         };
