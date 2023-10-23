@@ -1,16 +1,16 @@
 # Web5Service
 
-This package provides a base Web5Service that can be extended to easily expose any existing API as a Web5 protocol. This project is based on [DWN-Proxy](https://github.com/TBD54566975/dwn-proxy-js), [DWN-SDK](https://github.com/TBD54566975/dwn-sdk-js), and [Web5-js](https://github.com/TBD54566975/web5-js) and may reimplement some features from those project.
+This package provides a base Web5Service that can be extended to easily expose an existing API as a Web5 protocol. This project is based on [DWN-Proxy](https://github.com/TBD54566975/dwn-proxy-js), [DWN-SDK](https://github.com/TBD54566975/dwn-sdk-js), and [Web5-js](https://github.com/TBD54566975/web5-js) and may reimplement some features from those project.
 
 
 ## Introduction
 
-Creating a service provider for Web5 requires several things. 
-* A service needs a DID and keys to sign with. 
-* It needs one or more DWNs it can recieve messages on.
-* It needs to integrate with existing REST APIs and be able to transform API responses to protocol messages sent to a DWN.
-* It needs to be able to create, sign, and verify Verifiable Credentials.
-* It needs to provide a protocol and protocol schemas in JSON.
+A Web5 Service includes several things. 
+* A DID and keys to sign with. 
+* One or more DWNs it can recieve messages on.
+* Integration with existing REST APIs to be able to transform API responses to protocol messages sent to a DWN.
+* Create, sign, and verify Verifiable Credentials.
+* Providing a protocol and protocol json-schemas.
 
 This base service provides functionality for all of these things.
 
