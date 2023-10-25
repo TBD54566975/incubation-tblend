@@ -42,7 +42,7 @@ export class MyWeb5Service extends Web5Service {
 
     constructor() {
         super();
-        this.addHandler(isCreateRequest, this.requestRIKI.bind(this));
+        this.addHandler(isCreateRequest, this.handleCreateRequest.bind(this));
     }
 
     // handle incoming DWN create message
