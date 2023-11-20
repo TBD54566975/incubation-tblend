@@ -1,5 +1,5 @@
 {
-  "name": "web5-service",
+  "name": "@web5/service",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
