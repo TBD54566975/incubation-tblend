@@ -1,9 +1,9 @@
-import { CreateVpOptions, CredentialSubject, VerifiableCredential, VerifiableCredentialTypeV1, VerifiablePresentation, utils } from '@web5/credentials';
+import { VerifiableCredential } from '@web5/credentials';
 import { Ed25519, Jose } from '@web5/crypto';
 import { DidIonMethod, PortableDid, DidService, DidKeySetVerificationMethodKey } from '@web5/dids';
 import { DataStoreLevel, Dwn, DwnInterfaceName, DwnMethodName, EventLogLevel, EventsGet, Jws, Message, MessageStoreLevel, MessagesGet, ProtocolsConfigure, ProtocolsConfigureMessage, ProtocolsQuery, RecordsDelete, RecordsQuery, RecordsRead, RecordsWrite, RecordsWriteOptions, UnionMessageReply } from '@tbd54566975/dwn-sdk-js'
-import { v4 as uuidv4 } from 'uuid';
 import { writeFile, readFile } from 'fs/promises';
+import { Temporal } from '@js-temporal/polyfill';
 
 import { ReadableWebToNodeStream } from 'readable-web-to-node-stream';
 
@@ -180,6 +180,10 @@ export class Web5Service {
         })
     }
 
+    getCurrentTimeInHighPrecision(): string {
+        return Temporal.Now.instant().toString({ smallestUnit: 'microseconds' });
+    }
+
     getKeyId(did: string): string {
         const secondColonIndex = did.indexOf(':', 4); // start search for : from the method portion
         const methodSpecificId = did.substring(secondColonIndex + 1);
@@ -200,64 +204,40 @@ export class Web5Service {
         return { status: { code, detail } };
     }
 
-    async createVC({ credentialSubject, subjectDid, type }: { credentialSubject: CredentialSubject, subjectDid: string, type: string }) {
+    async createVC({ credentialSubject, subjectDid, type }: { credentialSubject: any, subjectDid: string, type: string }) {
         if (!this.identity) {
             throw new Error('Not initialized')
         }
 
-        const vc1: VerifiableCredentialTypeV1 = {
+        const vc = new VerifiableCredential({
             '@context': ['https://www.w3.org/2018/credentials/v1'],
-            id: uuidv4(),
-            type: ['VerifiableCredential', type],
+            type: [type],
             issuer: this.identity.did,
-            issuanceDate: utils.getCurrentXmlSchema112Timestamp(),
-            credentialSubject
-        };
+            subject: subjectDid,
+            credentialSubject,
+            issuanceDate: this.getCurrentTimeInHighPrecision()
+        });
 
         const keyId = this.getKeyId(this.identity.did);
 
-        const verifiableCredentialJWT = await VerifiableCredential.create({
-            kid: keyId,
+        const signOptions = {
             issuerDid: this.identity.did,
             subjectDid,
+            kid: keyId,
             signer: this.getSigner()
-        }, undefined, vc1)
+        };
+
+        const verifiableCredentialJWT = vc.sign(signOptions);
 
         return verifiableCredentialJWT;
     }
 
     decodeVC(verifiableCredentialJWT: string) {
-        return VerifiableCredential.decode(verifiableCredentialJWT);
+        return VerifiableCredential.parseJwt(verifiableCredentialJWT);
     }
 
     async verifyVC(verifiableCredentialJWT: string) {
         await VerifiableCredential.verify(verifiableCredentialJWT);
-        return true;
-    }
-
-    async createVP(createVpOptions: CreateVpOptions, subjectDid: string) {
-        if (!this.identity) {
-            throw new Error('Not initialized')
-        }
-
-        const keyId = this.getKeyId(this.identity.did);
-
-        const verifiablePresentationJWT = await VerifiablePresentation.create({
-            kid: keyId,
-            issuerDid: this.identity.did,
-            subjectDid,
-            signer: this.getSigner()
-        }, createVpOptions);
-
-        return verifiablePresentationJWT;
-    }
-
-    decodeVP(verifiablePresentationJWT: string) {
-        return VerifiablePresentation.decode(verifiablePresentationJWT);
-    }
-
-    async verifyVP(verifiablePresentationJWT: string) {
-        await VerifiablePresentation.verify(verifiablePresentationJWT);
         return true;
     }
 
