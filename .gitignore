@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+coverage.json
+db-data
+script.js
+/DATA
+
+.DS_Store
+
+keys.json
+
+.env
