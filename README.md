@@ -23,7 +23,7 @@ import manifest from "./assets/manifest.json";
 import { PresentationExchange, VerifiableCredential } from '@web5/credentials';
 
 async function start() {
-    await init({
+    await startServer({
             credentials: [{
                 name: "example", // provide a slugified name
                 manifest, // provide a credential manifest https://identity.foundation/credential-manifest/spec/v1.0.0/
