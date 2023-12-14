@@ -91,7 +91,9 @@ export const routes = [
                     credentialTypeFound.manifest.presentation_definition
                 )
 
-                return h.response(credentialTypeFound.handler(req.payload as object, applicant, app.identity.did, getKeyId(applicant), getSigner(app.identity.keySet.verificationMethodKeys![0].privateKeyJwk as PrivateKeyJwk)));
+                const response = await credentialTypeFound.handler(req.payload as object, applicant, app.identity.did, getKeyId(applicant), getSigner(app.identity.keySet.verificationMethodKeys![0].privateKeyJwk as PrivateKeyJwk));
+
+                return h.response(response);
             },
             description: "Request a credential using a Presentation Submission",
             tags: ["api", "credentials"],
