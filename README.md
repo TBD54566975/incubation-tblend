@@ -25,7 +25,6 @@ import { PresentationExchange, VerifiableCredential } from '@web5/credentials';
 async function start() {
     await startServer({
             credentials: [{
-                name: "example", // provide a slugified name
                 manifest, // provide a credential manifest https://identity.foundation/credential-manifest/spec/v1.0.0/
                 // provide a handler function with custom logic to issue the credential(s)
                 handler: async (presentation: any, issuerDid: string, subjectDid: string, kid: string, signer: Signer) => {
