@@ -14,23 +14,20 @@ import config from "./config";
 
 export type CredentialRequestHandler = (presentation: object, issuerDid: string, subjectDid: string, kid: string, signer: Signer) => Promise<object>
 
+export type CredentialType = {
+    manifest: any,
+    handler: CredentialRequestHandler
+}
+
 export type CustomServerApplicationState = ServerApplicationState & {
-    credentials: [{
-        name: string,
-        manifest: any,
-        handler: CredentialRequestHandler
-    }],
+    credentials: CredentialType[],
     identity: PortableDid
 }
 
 export type ServiceOptions = {
     keyFile?: string,
     services?: DidService[],
-    credentials: [{
-        name: string,
-        manifest: any,
-        handler: CredentialRequestHandler
-    }],
+    credentials: CredentialType[],
 }
 
 export type Signer = (data: Uint8Array) => Promise<Uint8Array>

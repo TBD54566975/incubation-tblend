@@ -21,7 +21,6 @@ describe('API', () => {
     before(async () => {
         await init({
             credentials: [{
-                name: "example",
                 manifest,
                 handler: async (presentation: any, issuerDid: string, subjectDid: string, kid: string, signer: Signer) => {
                     const selectedCreds = PresentationExchange.selectCredentials(presentation.verifiableCredential, manifest.presentation_definition);
@@ -71,14 +70,14 @@ describe('API', () => {
         });
 
         expect(res.statusCode).to.equal(200);
-        expect(res.payload).to.contain('example');
+        expect(res.payload).to.contain('EXAMPLE-CREDENTIAL');
 
     })
 
     it('should provide a manifest', async () => {
         const res = await service.inject({
             method: 'get',
-            url: '/api/example/manifest',
+            url: '/api/EXAMPLE-CREDENTIAL/manifest',
         });
 
         expect(res.statusCode).to.equal(200);
@@ -115,7 +114,7 @@ describe('API', () => {
 
         const res = await service.inject({
             method: 'post',
-            url: '/api/example/application',
+            url: '/api/EXAMPLE-CREDENTIAL/application',
             payload: presentationResult.presentation,
             headers: {
                 'X-Request-Applicant': testIdentity.did,

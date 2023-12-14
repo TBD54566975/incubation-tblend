@@ -15,7 +15,7 @@ export const routes = [
         config: {
             handler: (req: Request, h: ResponseToolkit) => {
                 const app = <CustomServerApplicationState>req.server.app
-                return h.response(app.credentials.map(o => o.name)).type("application/json");
+                return h.response(app.credentials.map(o => o.manifest.id)).type("application/json");
             },
             description: "Get the Credential types this service provides",
             tags: ["api", "credentials"],
@@ -29,11 +29,13 @@ export const routes = [
                 const app = <CustomServerApplicationState>req.server.app
                 const credentialType = req.params.credentialType;
 
-                const credentialTypeFound = app.credentials.find(o => o.name === credentialType)
+                const credentialTypeFound = app.credentials.find(o => o.manifest.id === credentialType)
 
                 if (!credentialTypeFound) {
                     return h.response("Not Found").code(404);
                 }
+
+                credentialTypeFound.manifest.issuer.id = app.identity.did;
 
                 return h.response(credentialTypeFound.manifest).type("application/json");
             },
@@ -53,7 +55,7 @@ export const routes = [
                 const applicant = req.headers['x-request-applicant'];
                 const signature = req.headers['x-request-signature'];
 
-                const credentialTypeFound = app.credentials.find(o => o.name === credentialType)
+                const credentialTypeFound = app.credentials.find(o => o.manifest.id === credentialType)
                 if (!credentialTypeFound) {
                     return h.response("Not Found").code(404);
                 }
@@ -117,7 +119,6 @@ export const routes = [
                     verifiableCredential: Joi.array().items(Joi.string()).required()
                 }),
                 failAction: async (req: Request, h: ResponseToolkit, err: Error) => {
-                    // During development, log and respond with the full error.
                     console.error(err);
                     throw err;
                 }
