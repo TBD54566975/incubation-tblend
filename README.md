@@ -10,6 +10,13 @@ This service currently implements a REST API that roughly follows the spec.
 npm i https://github.com/TBD54566975/incubation-tblend
 ```
 
+## Configuration
+
+See the file `.env.example`
+
+Create a new file `.env` to set the environment variables as needed or provide them at runtime.
+
+
 ## API Docs
 
 This service provides a Swagger UI and swagger.json. After starting the service, open a browser to http://localhost:3000/api/documentation
