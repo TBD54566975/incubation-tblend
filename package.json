@@ -2,12 +2,10 @@
   "name": "verifiable-credential-issuer",
   "version": "1.0.0",
   "description": "Verifiable Credential Issuer API",
-  "main": "service.js",
-  "type": "module",
+  "main": "./dist/service.js",
   "scripts": {
     "test": "lab --typescript -I 'CSS,__core-js_shared__,Symbol(react-redux-context)'",
-    "build": "tsc -p .",
-    "start": "node  --no-warnings ./dist/server.js"
+    "build": "tsc -p ."
   },
   "author": "",
   "license": "ISC",
