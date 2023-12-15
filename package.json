@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Verifiable Credential Issuer API",
   "main": "./dist/service.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "test": "lab --typescript -I 'CSS,__core-js_shared__,Symbol(react-redux-context)'",
     "build": "tsc -p .",
