@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "lab --typescript -I 'CSS,__core-js_shared__,Symbol(react-redux-context)'",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "post-install": "npm run build"
   },
   "author": "",
   "license": "ISC",
