@@ -8,7 +8,7 @@ import { writeFile, readFile } from 'fs/promises';
 
 import { DidIonMethod, DidService, PortableDid } from "@web5/dids";
 
-import { routes } from "./api/routes";
+import { generateRoutes } from "./api/routes";
 
 import config from "./config";
 
@@ -98,7 +98,7 @@ export const setup = async (options: ServiceOptions) => {
     app.identity = await initDID({ keyFile, services });
     app.credentials = options.credentials;
 
-    service.route(routes);
+    service.route(generateRoutes(options.credentials));
 };
 
 //used for tests instead of start()
