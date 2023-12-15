@@ -73,6 +73,7 @@ export const initDID = async (options: { keyFile: string, services: DidService[]
         });
 
         await writeFile(options.keyFile, JSON.stringify({
+            did: identity.did,
             keySet: identity.keySet,
             services: options.services,
         }, null, 2));
