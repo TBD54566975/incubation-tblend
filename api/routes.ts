@@ -44,7 +44,7 @@ export function generateRoutes(credentials: CustomServerApplicationState["creden
                 tags: ["api", "credentials"],
                 validate: {
                     params: Joi.object({
-                        credentialType: Joi.string().valid(credentials.map(o => o.manifest.id)).required(),
+                        credentialType: Joi.string().valid(...credentials.map(o => o.manifest.id)).required(),
                     }),
                 }
             }
@@ -111,7 +111,7 @@ export function generateRoutes(credentials: CustomServerApplicationState["creden
                         "x-request-signature": Joi.string().required(),
                     }).options({ allowUnknown: true }),
                     params: Joi.object({
-                        credentialType: Joi.string().valid(credentials.map(o => o.manifest.id)).required(),
+                        credentialType: Joi.string().valid(...credentials.map(o => o.manifest.id)).required(),
                     }),
                     payload: Joi.object({
                         "@context": Joi.array().items(Joi.string()).required(),
