@@ -1,6 +1,6 @@
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import Joi from "joi";
-import { CustomServerApplicationState } from "../service";
+import { CustomServerApplicationState, service } from "../service";
 
 import { PresentationExchange } from "@web5/credentials";
 import { getKeyId, getSigner, verifySignature } from "../lib/util";
@@ -41,6 +41,11 @@ export const routes = [
             },
             description: "Get the Credential Manifest",
             tags: ["api", "credentials"],
+            validate: {
+                params: Joi.object({
+                    credentialType: Joi.string().valid((<CustomServerApplicationState>service.app).credentials.map(o => o.manifest.id)).required(),
+                }),
+            }
         }
     },
     {
@@ -104,6 +109,9 @@ export const routes = [
                     "x-request-applicant": Joi.string().required(),
                     "x-request-signature": Joi.string().required(),
                 }).options({ allowUnknown: true }),
+                params: Joi.object({
+                    credentialType: Joi.string().valid((<CustomServerApplicationState>service.app).credentials.map(o => o.manifest.id)).required(),
+                }),
                 payload: Joi.object({
                     "@context": Joi.array().items(Joi.string()).required(),
                     type: Joi.array().items(Joi.string()).required(),
