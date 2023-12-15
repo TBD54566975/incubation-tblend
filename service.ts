@@ -94,11 +94,11 @@ export const setup = async (options: ServiceOptions) => {
         { plugin: HapiSwagger, options: config.swagger },
     ]);
 
-    service.route(routes);
-
     const app = <CustomServerApplicationState>service.app;
     app.identity = await initDID({ keyFile, services });
     app.credentials = options.credentials;
+
+    service.route(routes);
 };
 
 //used for tests instead of start()
