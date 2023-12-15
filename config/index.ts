@@ -5,6 +5,7 @@ const serviceName = process.env.SERVICE_NAME || "verifiable-credential-issuer";
 
 let swaggerHost = externalHostname;
 if (externalPort !== 443) {
+    scheme = "http";
     swaggerHost = `${swaggerHost}:${externalPort}`;
 }
 
