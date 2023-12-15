@@ -7,7 +7,7 @@
   "scripts": {
     "test": "lab --typescript -I 'CSS,__core-js_shared__,Symbol(react-redux-context)'",
     "build": "tsc -p .",
-    "post-install": "npm run build"
+    "postinstall": "npm run build"
   },
   "author": "",
   "license": "ISC",
