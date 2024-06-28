@@ -1,5 +1,5 @@
 {
-  "id": "dcx-credential-manifest-example",
+  "id": "EXAMPLE-MANIFEST",
   "name": "DCX Credential Manifest Example",
   "description": "This is an example of a credential manifest used by DCX. This document should be replaced with your own version to satify the requirements of the credentials your DCX server expects as inputs and the desired output credential.",
   "spec_version": "https://identity.foundation/credential-manifest/spec/v1.0.0/",

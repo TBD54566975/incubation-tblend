@@ -1,22 +1,23 @@
 # Decentralized Credential Exchange (DCX)
 
+DCX is a new DWeb Node (DWN) procotol proposal (implemented as a npm package) with the purpose of facilitating the decentralized exchange of credentials between applicants, issuers and data providers. is both a protocol and a software package. The DCX protocol defines a process for verifiable credential exchange between user agents and issuers via DWN protocols. The DCX package is a FOSS npm package that implements the protocol in addition to a "credentials in, credentials out" asynchronous web server that manages protocol interactions between user agents and DWN servers. The goal of this project is to implement a well documented, abstractly designed npm package to make participation in the dcx protocol as simple as running `npm install @formfree/dcx`.
+
 ## Package Versions
 
 | Name                                                 |                                                                Latest Version                                                                 |
 | ---------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------: |
 | [@formfree/dcx](/src) | [![badge](https://img.shields.io/npm/v/@formfree/dcx)](https://www.npmjs.com/package/@formfree/dcx/common) |
-
-
-Decentralized Credential Exchange (DCX) is a new DWeb Node (DWN) procotol proposal (implemented as a npm package) with the purpose of facilitating the decentralized exchange of credentials between applicants, issuers and data providers. is both a protocol and a software package. The DCX protocol defines a process for verifiable credential exchange between user agents and issuers via DWN protocols. The DCX package is a FOSS npm package that implements the protocol in addition to a "credentials in, credentials out" asynchronous web server that manages protocol interactions between user agents and DWN servers. The goal of this project is to implement a well documented, abstractly designed npm package and merge it into the Web5 monorepo under the name `@web5/dcx`, so developers can `npm install @web5/dcx` into any javascript/typescript project and run a DCX server to participate in the DCX protocol.
+<!-- | [@formfree/dcx](/src) | [![badge](https://img.shields.io/npm/v/@formfree/dcx)](https://www.npmjs.com/package/@formfree/dcx/common) | -->
+<!-- | [@formfree/dcx](/src) | [![badge](https://img.shields.io/npm/v/@formfree/dcx)](https://www.npmjs.com/package/@formfree/dcx/common) | -->
 
 ## Package
 
-The DCX package is a FOSS npm package used to bootstrap running a DCX issuer server. The package handles the connection between the DCX server and its corresponding DWN server and provides the following functionality:
+The DCX package is a FOSS npm package used to bootstrap running a DCX issuer server. The package provides the following functionality:
 
-1. DCX to DWN server connection - asynchronous communication between issuers and applicants
-2. DCX to DHT gateway connection - asynchronous communication between issuers and DHT gateways
-3. DID DHT key management - import/export/create DID DHT keys
-4. DCX protocol & handlers - integrated with api handlers to facilitate required interactions with DWNs and 3rd parties
+1. Web5 connection: manages connection to the Web5 platform and facilitates all operations
+2. DWN connection: manages connection to local/remote DWN an handles asynchronous communication between issuers and applicants
+3. DID DHT management: manages import, export & creation of DHT DIDs
+4. DCX protocol handlers: implements generic protocol handlers to do VC verification, data requests and VC issuance
 
 ## Protocol
 
@@ -49,7 +50,11 @@ The DCX protocol and its varying schemas can be found below:
   - [`src/protocol/manifests/EXAMPLE-MANIFEST.json`](./src/protocol/manifests/EXAMPLE-MANIFEST.json) defines an example manifest
   - **NOTE**: Manifests do not ship with the DCX package. Developers are required to provide their own manifests when building their DCX issuer server
 
-## Architecture Diagram
+## Docs & Diagrams
+
+Additional docs & diagram files can be found in the [/docs](/docs) folder.
+
+### Architecture Diagram
 
 - **DCX**: Protocol boundary within which actors communicate
 - **DCX Issuer**: Web server running @web5/dcx and web5-js
@@ -64,7 +69,7 @@ The DCX protocol and its varying schemas can be found below:
 
 ## Sequence Diagrams
 
-#### Full Sequence
+#### Full Protocol
 
 <details>
 
@@ -100,7 +105,7 @@ The DCX protocol and its varying schemas can be found below:
 
 </details>
 
-#### Issuer Sequence
+#### Issuer Protocol
 
 <details>
 
@@ -120,7 +125,7 @@ The DCX protocol and its varying schemas can be found below:
 
 ![dcx-issuer-sequence](./docs/img/dcx-issuer-sequence.png)
 
-#### Applicant Sequence
+#### Applicant Protocol
 
 <details>
 

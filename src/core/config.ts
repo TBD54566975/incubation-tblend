@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { TrustedIssuer } from '../index.js';
+import { Issuer } from '../index.js';
 dotenv.config();
 export class Config {
   public static PORT = process.env.PORT || 3000;
@@ -11,10 +11,9 @@ export class Config {
   public static DWN_CURSOR = `${process.cwd()}/cursor.json`;
 
   public static DHT_GATEWAY_ENDPOINT = process.env.DHT_GATEWAY_ENDPOINT || 'http://localhost:8305/';
-  public static DCX_DID_URI = process.env.DCX_DID_URI || '';
   public static DCX_DID_FILEPATH = process.env.DCX_DID_FILEPATH || '';
   public static DWN_ENDPOINTS = process.env.DWN_ENDPOINTS?.split(',') || ['http://localhost:3000'];
-
+  // TODO: remove the following from env: VC_DATA_PROVIDER, VC_ID, VC_NAME, VC_DATA_PROVIDER_ENDPOINT, VC_TRUSTED_ISSUERS
   public static VC_DATA_PROVIDER = process.env.VC_DATA_PROVIDER || '';
   public static VC_ID = process.env.VC_ID || 'dcx-verifiable-credential';
   public static VC_NAME = process.env.VC_NAME || 'DCXVerifiableCredential';
@@ -23,10 +22,10 @@ export class Config {
     JSON.parse(process.env.VC_TRUSTED_ISSUERS)) || [
       {
         name: 'mx',
-        did: 'did:dht:sa713dw7jyg44ejwcdf8iqcseh7jcz51wj6fjxbooj41ipeg76eo',
+        id: 'did:dht:sa713dw7jyg44ejwcdf8iqcseh7jcz51wj6fjxbooj41ipeg76eo',
       },
     ];
-  public static VC_TRUSTED_ISSUER_DIDS = Config.VC_TRUSTED_ISSUERS.map((issuer: TrustedIssuer) => issuer.did);
+  public static VC_TRUSTED_ISSUER_DIDS = Config.VC_TRUSTED_ISSUERS.map((issuer: Issuer) => issuer.id);
 
   // Private class variables
   private _CIPHER_KEY: Buffer = Buffer.from(process.env.CIPHER_KEY || '', 'base64');

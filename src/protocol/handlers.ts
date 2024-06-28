@@ -9,9 +9,8 @@ import { Web5Manager } from '../core/index.js';
 import {
   AdditionalProperties,
   CredentialManifest,
-  ServerOptionHandlers,
-  TrustedIssuer,
-  VcDataRequest,
+  Issuer,
+  UseOption,
   VcVerification
 } from '../types/dcx.js';
 import { DwnUtils } from '../utils/dwn.js';
@@ -22,7 +21,7 @@ import { credentialIssuerProtocol, responseSchema } from './index.js';
 
 
 export class ProtocolHandlerUtils {
-  public static handlers: ServerOptionHandlers;
+  public static handlers: UseOption;
   /**
    *
    * Verify DCX application VCs
@@ -108,7 +107,7 @@ export class ProtocolHandlers extends ProtocolHandlerUtils {
       }
 
       const { status: send } = await record?.send(recordAuthor);
-      Logger.debug(`${this.name}: Sent applicatino response to applicant DWN`, send, create);
+      Logger.debug(`${this.name}: Sent application response to applicant DWN`, send, create);
     } catch (error: any) {
       Logger.error(this.name, error);
       throw error;
@@ -127,14 +126,14 @@ export class ProtocolHandlers extends ProtocolHandlerUtils {
     vp: VerifiablePresentation,
     subjectDid: string,
     credentialManifest?: CredentialManifest,
-    manifestName?: string,
+    manifestId?: string,
   ) {
 
-    if (!manifestName && !credentialManifest) {
+    if (!manifestId && !credentialManifest) {
       throw new DcxProtocolHandlerError('Must provide either manifest or manifest name');
     }
 
-    const manifest = !!manifestName ? Web5Manager.manifests?.[manifestName] : credentialManifest;
+    const manifest = !!manifestId ? Web5Manager.manifests.get(manifestId) : credentialManifest as CredentialManifest;
 
     if (!manifest) {
       throw new DcxProtocolHandlerError('Manifest not found');
@@ -157,24 +156,28 @@ export class ProtocolHandlers extends ProtocolHandlerUtils {
       Logger.debug(`VCs do not satisfy Presentation Definition`, error.message);
     }
 
-    const trustedIssuerDids = Config.VC_TRUSTED_ISSUERS.map(
-      (trustedIssuer: TrustedIssuer) => trustedIssuer.did,
-    );
+    const useIssuers = Object.values(Web5Manager.issuers).map((issuer: Issuer) => issuer.id);
+    const issuerDidSet = new Set<string>([...useIssuers, ...Config.VC_TRUSTED_ISSUER_DIDS]);
 
     const verifiedCredentials: VerifiableCredential[] = [];
 
     for (const vcJwt of selectedCredentials) {
+
       Logger.debug('Parsing VC', vcJwt);
       const vc = VerifiableCredential.parseJwt({ vcJwt });
+
       Logger.debug('Parsed VC', stringifier(vc));
       if (vc.subject !== subjectDid) {
         continue;
       }
+
       Logger.debug('vcJson', vc.vcDataModel.credentialSubject);
-      if (trustedIssuerDids.includes(vc.vcDataModel.issuer)) {
+      if (issuerDidSet.has(vc.vcDataModel.issuer as string)) {
         verifiedCredentials.push(vc);
       }
+
     }
+
     Logger.debug(`Found ${verifiedCredentials.length} valid VCs`);
 
     // request vc data
@@ -188,6 +191,7 @@ export class ProtocolHandlers extends ProtocolHandlerUtils {
       subject: subjectDid,
       data: vcData,
     });
+
     // sign vc
     const signedOutputVc = await outputVc.sign({ did: Web5Manager.connected.bearerDid });
 
@@ -201,7 +205,7 @@ export class ProtocolHandlers extends ProtocolHandlerUtils {
           },
         ],
       },
-      verifiableCredential: signedOutputVc,
+      verifiableCredential: [signedOutputVc],
     };
   }
 
@@ -213,11 +217,9 @@ export class ProtocolHandlers extends ProtocolHandlerUtils {
    * @returns
    */
   public static async requestVerifiableCredentialData(
-    body: VcDataRequest,
+    body: { vcs: VerifiableCredential[] },
     method: string = 'POST',
-    headers: AdditionalProperties = {
-      'Content-Type': 'application/json',
-    },
+    headers: AdditionalProperties = { 'Content-Type': 'application/json' },
   ) {
     Logger.debug(`Requesting VC data from ${Config.VC_DATA_PROVIDER} at ${Config.VC_DATA_PROVIDER_ENDPOINT}`);
 

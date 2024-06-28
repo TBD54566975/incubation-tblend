@@ -18,3 +18,5 @@ connection.json
 connected.json
 previous.json
 did:dht*.json
+test-server.ts
+.ignore
